@@ -21,7 +21,7 @@ struct MarkdownEditorA: View {
     }
     
     var body: some View {
-        HighlightedTextEditor(text: $text, highlightRules: .markdown)
+        HighlightedTextEditor(text: $text, highlightRules: .markdown, cursor: .constant(0...0))
     }
 }
 
@@ -36,7 +36,7 @@ struct MarkdownEditorB: View {
     }
     
     var body: some View {
-        HighlightedTextEditor(text: $text, highlightRules: .markdown)
+        HighlightedTextEditor(text: $text, highlightRules: .markdown, cursor: .constant(0...0))
     }
 }
 
@@ -50,7 +50,7 @@ struct MarkdownEditorC: View {
     }
     
     var body: some View {
-        HighlightedTextEditor(text: $text, highlightRules: .markdown)
+        HighlightedTextEditor(text: $text, highlightRules: .markdown, cursor: .constant(0...0))
     }
 }
 
@@ -58,7 +58,7 @@ struct URLEditor: View {
     @State var text: String = "No formatting\n\nhttps://www.google.com/"
     
     var body: some View {
-        HighlightedTextEditor(text: $text, highlightRules: .url)
+        HighlightedTextEditor(text: $text, highlightRules: .url, cursor: .constant(0...0))
     }
 }
 
@@ -81,7 +81,7 @@ struct FontTraitEditor: View {
             HighlightRule(pattern: betweenUnderscores, formattingRules: [
                 TextFormattingRule(fontTraits: fontTraits)
             ])
-        ])
+        ], cursor: .constant(0...0))
     }
 }
 
@@ -97,7 +97,7 @@ struct NSAttributedStringKeyEditor: View {
                 TextFormattingRule(key: .underlineStyle, value: NSUnderlineStyle.single.rawValue),
                 TextFormattingRule(key: .underlineColor, value: NSUIColor.purple)
             ])
-        ])
+        ], cursor: .constant(0...0))
     }
 }
 
@@ -105,7 +105,7 @@ struct FontModifiersEditor: View {
     @State private var text: String = "The text is _formatted_"
     
     var body: some View {
-        HighlightedTextEditor(text: $text, highlightRules: [])
+        HighlightedTextEditor(text: $text, highlightRules: [], cursor: .constant(0...0))
             .defaultColor(.red)
             .defaultFont(.systemFont(ofSize: 30))
             .insertionPointColor(.green)
@@ -149,7 +149,7 @@ struct BackgroundChangesEditor: View {
     #else
     @State var backgroundColor: UIColor = .red
     private var editor: some View {
-        HighlightedTextEditor(text: $text, highlightRules: [])
+        HighlightedTextEditor(text: $text, highlightRules: [], cursor: .constant(0...0))
             .backgroundColor(backgroundColor)
     }
     #endif
@@ -186,7 +186,7 @@ struct AutocapitalizationTypeEditor: View {
             let type = autocapitalizationTypes[i]
             let binding = bindings[i]
             
-            return HighlightedTextEditor(text: binding, highlightRules: [])
+            return HighlightedTextEditor(text: binding, highlightRules: [], cursor: .constant(0...0))
                 .autocapitalizationType(type)
                 .border(Color.black)
                 .eraseToAnyView()
@@ -206,10 +206,10 @@ struct AutocorrectionTypeEditor: View {
         return VStack {
             Button("Toggle Autocorrect") { autocorrect.toggle() }
             if autocorrect {
-                HighlightedTextEditor(text: $text, highlightRules: [])
+                HighlightedTextEditor(text: $text, highlightRules: [], cursor: .constant(0...0))
                     .autocorrectionType(.yes)
             } else {
-                HighlightedTextEditor(text: $text, highlightRules: [])
+                HighlightedTextEditor(text: $text, highlightRules: [], cursor: .constant(0...0))
                     .autocorrectionType(.no)
             }
         }
@@ -224,7 +224,7 @@ struct KeyboardTypeEditor: View {
         #if os(macOS)
         return EmptyView()
         #else
-        return HighlightedTextEditor(text: $text, highlightRules: [])
+        return HighlightedTextEditor(text: $text, highlightRules: [], cursor: .constant(0...0))
             .keyboardType(.phonePad)
         #endif
     }
@@ -237,7 +237,7 @@ struct OnSelectionChangeEditor: View {
     
     var body: some View {
         VStack {
-            HighlightedTextEditor(text: $text, highlightRules: [])
+            HighlightedTextEditor(text: $text, highlightRules: [], cursor: .constant(0...0))
                 .onSelectionChange { (range: NSRange) in
                     selectionChanges += 1
                     selectedRange = range

@@ -9,6 +9,8 @@ public struct HighlightedTextEditor: UIViewRepresentable, HighlightingTextEditor
             self.onTextChange(text)
         }
     }
+    @Binding var cursor: ClosedRange<Int>
+
     let highlightRules: [HighlightRule]
     
     var onEditingChanged                   : () -> Void                   = {}
@@ -32,13 +34,15 @@ public struct HighlightedTextEditor: UIViewRepresentable, HighlightingTextEditor
         highlightRules: [HighlightRule],
         onEditingChanged: @escaping () -> Void = {},
         onCommit: @escaping () -> Void = {},
-        onTextChange: @escaping (String) -> Void = { _ in }
+        onTextChange: @escaping (String) -> Void = { _ in },
+        cursor: Binding<ClosedRange<Int>>
     ) {
         _text = text
         self.highlightRules = highlightRules
         self.onEditingChanged = onEditingChanged
         self.onCommit = onCommit
         self.onTextChange = onTextChange
+        _cursor = cursor
     }
 
     public func makeCoordinator() -> Coordinator {
@@ -75,6 +79,15 @@ public struct HighlightedTextEditor: UIViewRepresentable, HighlightingTextEditor
         updateTextViewModifiers(uiView)
         uiView.isScrollEnabled = !isScrollingDisabled
         uiView.selectedTextRange = context.coordinator.selectedTextRange
+        
+        if cursor != uiView.selectedTextRange?.toClosedRange(uiView) {
+            if let newPos = uiView.position(from: uiView.beginningOfDocument, offset: cursor.lowerBound),
+               let newPos2 = uiView.position(from: uiView.beginningOfDocument, offset: cursor.upperBound)
+            {
+                uiView.selectedTextRange = uiView.textRange(from: newPos, to: newPos2)
+            }
+        }
+        
         context.coordinator.updatingUIView = false
     }
     
@@ -113,10 +126,16 @@ public struct HighlightedTextEditor: UIViewRepresentable, HighlightingTextEditor
         }
         
         public func textViewDidChangeSelection(_ textView: UITextView) {
+            guard !updatingUIView else { return }
+            
+            selectedTextRange = textView.selectedTextRange
+            
+            let pos: ClosedRange<Int> = self.selectedTextRange?.toClosedRange(textView) ?? 0...0
+            parent.cursor = pos
+            
             guard let onSelectionChange = parent.onSelectionChange,
                   !updatingUIView
             else { return }
-            selectedTextRange = textView.selectedTextRange
             onSelectionChange([textView.selectedRange])
         }
         
@@ -201,6 +220,14 @@ extension HighlightedTextEditor {
         var new = self
         new.isScrollingDisabled = isDisabled
         return new
+    }
+}
+
+private extension UITextRange {
+    func toClosedRange(_ textView: UITextView) -> ClosedRange<Int> {
+        let start = textView.offset(from: textView.beginningOfDocument, to: self.start)
+        let end = textView.offset(from: textView.beginningOfDocument, to: self.end)
+        return start...end
     }
 }
 #endif

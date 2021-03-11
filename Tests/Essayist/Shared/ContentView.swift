@@ -11,6 +11,7 @@ import HighlightedTextEditor
 struct ContentView: View {
     @State private var text: String = ""
     @State private var currentEditor: EditorType = .blank
+    @State private var cursor: ClosedRange<Int> = 0...0
     
     var layout: some View {
         VStack {
@@ -48,7 +49,7 @@ struct ContentView: View {
     private var editorView: some View {
         switch currentEditor {
         case .blank:
-            return HighlightedTextEditor(text: $text, highlightRules: [])
+            return HighlightedTextEditor(text: $text, highlightRules: [], cursor: $cursor)
                 .eraseToAnyView()
         case .markdownA:
             return MarkdownEditorA()
